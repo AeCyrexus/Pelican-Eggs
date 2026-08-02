@@ -1,0 +1,203 @@
+{
+    "_comment": "Pelican Panel Egg for LavaMusic (https://github.com/AeCyrexus/Lavalink).",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-08-02T00:00:00+00:00",
+    "name": "LavaMusic",
+    "author": "eggs@zephycube.com",
+    "description": "LavaMusic is a feature-rich Discord music bot built with discord.js, TypeScript, and lavalink-client, built from AeCyrexus/Lavalink. Requires a separate Lavalink audio server (this repo is the bot, not the Lavalink server jar).",
+    "features": null,
+    "docker_images": {
+        "Bun (yolks)": "ghcr.io/parkervcp/yolks:bun_latest",
+        "Bun (official)": "oven/bun:latest"
+    },
+    "file_denylist": [],
+    "startup": "if echo \"${DATABASE_URL}\" | grep -qE '(^sqlite:|\\.db$|\\.sqlite$)'; then bun run db:push:sqlite; else bun run db:push; fi && bun run dist/index.js",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"is ready!\"\r\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# LavaMusic installation script\nset -e\n\napt update -y >/dev/null 2>&1 || apk update >/dev/null 2>&1 || true\napt install -y git curl unzip ca-certificates >/dev/null 2>&1 || apk add --no-cache git curl unzip ca-certificates >/dev/null 2>&1 || true\n\ncd /mnt/server\n\nif [ -z \"${VERSION}\" ] || [ \"${VERSION}\" == \"latest\" ]; then\n    BRANCH=\"main\"\nelse\n    BRANCH=\"${VERSION}\"\nfi\n\necho \"-----------------------------------\"\necho \"Cloning LavaMusic (${BRANCH})\"\necho \"-----------------------------------\"\n\nrm -rf /mnt/server/tmp_lavamusic\ngit clone --branch \"${BRANCH}\" --depth 1 https://github.com/AeCyrexus/Lavalink.git /mnt/server/tmp_lavamusic \\\n    || git clone --depth 1 https://github.com/AeCyrexus/Lavalink.git /mnt/server/tmp_lavamusic\n\nshopt -s dotglob 2>/dev/null || true\ncp -r /mnt/server/tmp_lavamusic/* /mnt/server/ 2>/dev/null || true\ncp -r /mnt/server/tmp_lavamusic/.[!.]* /mnt/server/ 2>/dev/null || true\nrm -rf /mnt/server/tmp_lavamusic\n\necho \"-----------------------------------\"\necho \"Installing dependencies\"\necho \"-----------------------------------\"\ncurl -fsSL https://bun.sh/install | bash >/dev/null 2>&1 || true\nexport PATH=\"$HOME/.bun/bin:$PATH\"\nwhich bun || (echo \"bun not found, aborting\" && exit 1)\n\nbun install\n\necho \"-----------------------------------\"\necho \"Generating registry & building\"\necho \"-----------------------------------\"\nbun run generate\nbun run build\n\nrm -f /mnt/server/.env\n\necho \"-----------------------------------\"\necho \"Install complete\"\necho \"-----------------------------------\"\n",
+            "container": "ghcr.io/parkervcp/yolks:bun_latest",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Bot Token",
+            "description": "Your Discord bot token from the Discord Developer Portal.",
+            "env_variable": "TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Client ID",
+            "description": "Your Discord application's Client ID. Needed for /invite and /about commands.",
+            "env_variable": "CLIENT_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Lavalink Nodes",
+            "description": "JSON array of Lavalink node connections. Example: [{\"id\":\"Local Node\",\"host\":\"lavalink\",\"port\":2333,\"authorization\":\"youshallnotpass\",\"retryAmount\":5,\"retryDelay\":60000,\"secure\":false}]",
+            "env_variable": "NODES",
+            "default_value": "[{\"id\":\"Local Node\",\"host\":\"127.0.0.1\",\"port\":2333,\"authorization\":\"youshallnotpass\",\"retryAmount\":5,\"retryDelay\":60000,\"secure\":false}]",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Database URL",
+            "description": "Connection string for the bot's database. Use \"file:./lavamusic.db\" for SQLite, or a postgres:// URL for PostgreSQL.",
+            "env_variable": "DATABASE_URL",
+            "default_value": "file:./lavamusic.db",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Default Language",
+            "description": "Default locale for the bot (e.g. en-US).",
+            "env_variable": "DEFAULT_LANGUAGE",
+            "default_value": "en-US",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Prefix",
+            "description": "Message command prefix (only used if message-based commands are enabled).",
+            "env_variable": "PREFIX",
+            "default_value": "!",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:5",
+            "field_type": "text"
+        },
+        {
+            "name": "Owner IDs",
+            "description": "JSON array of Discord user IDs with bot owner permissions. Example: [\"123456789012345678\"]",
+            "env_variable": "OWNER_IDS",
+            "default_value": "[]",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Guild ID",
+            "description": "Restrict the bot to a single server by ID. Leave blank for global use.",
+            "env_variable": "GUILD_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Top.gg Token",
+            "description": "Top.gg API token for posting bot stats (optional).",
+            "env_variable": "TOPGG",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Log Channel ID",
+            "description": "Discord channel ID for Lavalink node status and guild join/leave logs (optional).",
+            "env_variable": "LOG_CHANNEL_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Log Commands Channel ID",
+            "description": "Discord channel ID where command usage logs are sent (optional).",
+            "env_variable": "LOG_COMMANDS_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Bot Status",
+            "description": "Bot's online presence status.",
+            "env_variable": "BOT_STATUS",
+            "default_value": "online",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:online,idle,dnd,invisible",
+            "field_type": "text"
+        },
+        {
+            "name": "Activity Type",
+            "description": "Discord activity type: 0=Playing, 1=Streaming, 2=Listening, 3=Watching, 4=Custom, 5=Competing.",
+            "env_variable": "BOT_ACTIVITY_TYPE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:0,5",
+            "field_type": "text"
+        },
+        {
+            "name": "Activity Text",
+            "description": "Text shown in the bot's activity status.",
+            "env_variable": "BOT_ACTIVITY",
+            "default_value": "Lavamusic",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Search Engine",
+            "description": "Default search engine used when playing songs.",
+            "env_variable": "SEARCH_ENGINE",
+            "default_value": "YouTubeMusic",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:YouTube,YouTubeMusic,SoundCloud,Spotify,Apple,Deezer,Yandex,JioSaavn",
+            "field_type": "text"
+        },
+        {
+            "name": "Genius API Token",
+            "description": "Client token from genius.com for fetching lyrics (optional).",
+            "env_variable": "GENIUS_API",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Version / Branch",
+            "description": "Git tag or branch of AeCyrexus/Lavalink to install. Used only during installation/reinstallation.",
+            "env_variable": "VERSION",
+            "default_value": "main",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        }
+    ]
+}
