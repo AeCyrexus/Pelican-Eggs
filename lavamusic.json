@@ -1,12 +1,12 @@
 {
-    "_comment": "Pelican Panel Egg for LavaMusic (https://github.com/AeCyrexus/Lavalink).",
+    "_comment": "Pelican Panel Egg for LavaMusic (https://github.com/AeCyrexus/Lavalink). Generated for lavamusic 4.7.0 (Bun runtime).",
     "meta": {
         "version": "PTDL_v2",
         "update_url": null
     },
     "exported_at": "2026-08-02T00:00:00+00:00",
     "name": "LavaMusic",
-    "author": "eggs@zephycube.com",
+    "author": "admin@example.com",
     "description": "LavaMusic is a feature-rich Discord music bot built with discord.js, TypeScript, and lavalink-client, built from AeCyrexus/Lavalink. Requires a separate Lavalink audio server (this repo is the bot, not the Lavalink server jar).",
     "features": null,
     "docker_images": {
@@ -23,8 +23,8 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!/bin/bash\n# LavaMusic installation script\nset -e\n\napt update -y >/dev/null 2>&1 || apk update >/dev/null 2>&1 || true\napt install -y git curl unzip ca-certificates >/dev/null 2>&1 || apk add --no-cache git curl unzip ca-certificates >/dev/null 2>&1 || true\n\ncd /mnt/server\n\nif [ -z \"${VERSION}\" ] || [ \"${VERSION}\" == \"latest\" ]; then\n    BRANCH=\"main\"\nelse\n    BRANCH=\"${VERSION}\"\nfi\n\necho \"-----------------------------------\"\necho \"Cloning LavaMusic (${BRANCH})\"\necho \"-----------------------------------\"\n\nrm -rf /mnt/server/tmp_lavamusic\ngit clone --branch \"${BRANCH}\" --depth 1 https://github.com/AeCyrexus/Lavalink.git /mnt/server/tmp_lavamusic \\\n    || git clone --depth 1 https://github.com/AeCyrexus/Lavalink.git /mnt/server/tmp_lavamusic\n\nshopt -s dotglob 2>/dev/null || true\ncp -r /mnt/server/tmp_lavamusic/* /mnt/server/ 2>/dev/null || true\ncp -r /mnt/server/tmp_lavamusic/.[!.]* /mnt/server/ 2>/dev/null || true\nrm -rf /mnt/server/tmp_lavamusic\n\necho \"-----------------------------------\"\necho \"Installing dependencies\"\necho \"-----------------------------------\"\ncurl -fsSL https://bun.sh/install | bash >/dev/null 2>&1 || true\nexport PATH=\"$HOME/.bun/bin:$PATH\"\nwhich bun || (echo \"bun not found, aborting\" && exit 1)\n\nbun install\n\necho \"-----------------------------------\"\necho \"Generating registry & building\"\necho \"-----------------------------------\"\nbun run generate\nbun run build\n\nrm -f /mnt/server/.env\n\necho \"-----------------------------------\"\necho \"Install complete\"\necho \"-----------------------------------\"\n",
-            "container": "ghcr.io/parkervcp/yolks:bun_latest",
+            "script": "#!/bin/bash\n# Bun App Installation Script\n#\n# Server Files: /mnt/server\napt update\napt install -y git curl jq file unzip make gcc g++ python python-dev libtool\nmkdir -p /mnt/server\ncd /mnt/server\n\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\n    echo -e \"assuming user knows what they are doing have a good day.\"\n    exit 0\nfi\n\n## add git ending if it's not on the address\nif [[ ${GIT_ADDRESS} != *.git ]]; then\n    GIT_ADDRESS=${GIT_ADDRESS}.git\nfi\n\nif [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\n    echo -e \"using anon api call\"\nelse\n    GIT_ADDRESS=\"https://${USERNAME}:${ACCESS_TOKEN}@$(echo -e ${GIT_ADDRESS} | cut -d/ -f3-)\"\nfi\n\n## pull git js bot repo\nif [ \"$(ls -A /mnt/server)\" ]; then\n    echo -e \"/mnt/server directory is not empty.\"\n    if [ -d .git ]; then\n        echo -e \".git directory exists\"\n        if [ -f .git/config ]; then\n            echo -e \"loading info from git config\"\n            ORIGIN=$(git config --get remote.origin.url)\n        else\n            echo -e \"files found with no git config\"\n            echo -e \"closing out without touching things to not break anything\"\n            exit 10\n        fi\n    fi\n\n    if [ \"${ORIGIN}\" == \"${GIT_ADDRESS}\" ]; then\n        echo \"pulling latest from github\"\n        git pull\n    fi\nelse\n    echo -e \"/mnt/server is empty.\\ncloning files into repo\"\n    if [ -z ${BRANCH} ]; then\n        echo -e \"cloning default branch\"\n        git clone ${GIT_ADDRESS} .\n    else\n        echo -e \"cloning ${BRANCH}'\"\n        git clone --single-branch --branch ${BRANCH} ${GIT_ADDRESS} .\n    fi\nfi\n\n\necho \"Installing bun packages\"\nif [[ ! -z ${BUN_PACKAGES} ]]; then\n    bun install ${BUN_PACKAGES}\nfi\n\nif [ -f /mnt/server/package.json ]; then\n    bun install\nfi\n\nif [ -f /mnt/server/scripts/generate-registry.ts ]; then\n    bun run generate\nfi\n\nbun run build\n\n## install end\necho \"-----------------------------------------\"\necho \"Installation completed...\"\necho \"-----------------------------------------\"\n",
+            "container": "ghcr.io/parkervcp/installers:debian",
             "entrypoint": "bash"
         }
     },
@@ -190,13 +190,63 @@
             "field_type": "text"
         },
         {
-            "name": "Version / Branch",
-            "description": "Git tag or branch of AeCyrexus/Lavalink to install. Used only during installation/reinstallation.",
-            "env_variable": "VERSION",
-            "default_value": "main",
+            "name": "Git Repository Address",
+            "description": "The git repository to install LavaMusic from.",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "https://github.com/AeCyrexus/Lavalink.git",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Branch",
+            "description": "Branch to clone. Leave blank to use the repository's default branch.",
+            "env_variable": "BRANCH",
+            "default_value": "main",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Username",
+            "description": "Only needed if GIT_ADDRESS points to a private repository.",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Access Token",
+            "description": "Only needed if GIT_ADDRESS points to a private repository (personal access token).",
+            "env_variable": "ACCESS_TOKEN",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Skip Install (Manual Upload)",
+            "description": "Set to true/1 if you've manually uploaded the bot files and want to skip cloning/building entirely.",
+            "env_variable": "USER_UPLOAD",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|in:true,false,0,1",
+            "field_type": "text"
+        },
+        {
+            "name": "Extra Bun Packages",
+            "description": "Space-separated list of extra packages to install with bun (optional).",
+            "env_variable": "BUN_PACKAGES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
             "field_type": "text"
         }
     ]
