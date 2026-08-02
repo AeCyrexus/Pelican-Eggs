@@ -6,7 +6,7 @@
     },
     "exported_at": "2026-08-02T00:00:00+00:00",
     "name": "LavaMusic",
-    "author": "admin@example.com",
+    "author": "egg@zephycube.com",
     "description": "LavaMusic is a feature-rich Discord music bot built with discord.js, TypeScript, and lavalink-client, built from AeCyrexus/Lavalink. Requires a separate Lavalink audio server (this repo is the bot, not the Lavalink server jar).",
     "features": null,
     "docker_images": {
@@ -37,7 +37,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Client ID",
@@ -47,7 +48,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Lavalink Nodes",
@@ -57,7 +59,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Database URL",
@@ -67,7 +70,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Default Language",
@@ -77,7 +81,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Prefix",
@@ -87,7 +92,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|max:5",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Owner IDs",
@@ -97,7 +103,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Guild ID",
@@ -107,7 +114,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Top.gg Token",
@@ -117,7 +125,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Log Channel ID",
@@ -127,7 +136,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Log Commands Channel ID",
@@ -137,7 +147,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Bot Status",
@@ -147,7 +158,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|in:online,idle,dnd,invisible",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Activity Type",
@@ -157,7 +169,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|integer|between:0,5",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Activity Text",
@@ -167,7 +180,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Search Engine",
@@ -177,7 +191,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|in:YouTube,YouTubeMusic,SoundCloud,Spotify,Apple,Deezer,Yandex,JioSaavn",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Genius API Token",
@@ -187,7 +202,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Git Repository Address",
@@ -197,7 +213,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Git Branch",
@@ -207,7 +224,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Git Username",
@@ -217,7 +235,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Git Access Token",
@@ -227,7 +246,8 @@
             "user_viewable": false,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Skip Install (Manual Upload)",
@@ -237,7 +257,8 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string|in:true,false,0,1",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         },
         {
             "name": "Extra Bun Packages",
@@ -247,7 +268,9 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "nullable|string",
-            "field_type": "text"
+            "field_type": "text",
+            "sort": null
         }
-    ]
+    ],
+    "uuid": "8fcf1440-2df4-4693-983a-6860b2cbd3d4"
 }
